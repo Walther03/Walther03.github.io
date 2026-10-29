@@ -121,29 +121,36 @@
           <h2 class="text-2xl font-bold text-white flex items-center gap-3">
             <i class="fa-solid fa-terminal text-indigo-400"></i> Runner de Pruebas en Vivo
           </h2>
-          <p class="text-slate-400 text-sm mt-1">Selecciona una suite para lanzar la ejecución real en el servidor de GitHub Actions vía Cloudflare Worker Proxy.</p>
+          <p class="text-slate-400 text-sm mt-1">Selecciona una suite de pruebas y presiona el botón "Ejecutar Suite" para iniciar la corrida real en GitHub Actions.</p>
         </div>
         <div id="runner-badge" class="self-start md:self-auto px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs font-semibold text-slate-300">
           Estado: Listo
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="grid md:grid-cols-2 gap-4 mb-8">
-        <button onclick="triggerRun('api')" id="btn-api" class="p-4 bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-xl text-left transition group">
+      <!-- Suite Selector Cards -->
+      <div class="grid md:grid-cols-2 gap-4 mb-6">
+        <div onclick="selectSuite('api')" id="card-api" class="p-4 bg-slate-900 border-2 border-indigo-500 rounded-xl cursor-pointer transition">
           <div class="flex justify-between items-center mb-1">
-            <span class="font-bold text-white group-hover:text-indigo-400 transition">Suite API REST</span>
-            <i class="fa-solid fa-play text-slate-500 group-hover:text-indigo-400 transition"></i>
+            <span class="font-bold text-white">Suite API REST</span>
+            <i id="radio-api" class="fa-solid fa-circle-dot text-indigo-400"></i>
           </div>
-          <p class="text-xs text-slate-400">Ejecuta tests contra JSONPlaceholder (RestAssured)</p>
-        </button>
+          <p class="text-xs text-slate-400">Pruebas contra JSONPlaceholder (RestAssured)</p>
+        </div>
 
-        <button onclick="triggerRun('web')" id="btn-web" class="p-4 bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-xl text-left transition group">
+        <div onclick="selectSuite('web')" id="card-web" class="p-4 bg-slate-900 border-2 border-slate-800 hover:border-slate-700 rounded-xl cursor-pointer transition">
           <div class="flex justify-between items-center mb-1">
-            <span class="font-bold text-white group-hover:text-indigo-400 transition">Suite Web E2E</span>
-            <i class="fa-solid fa-play text-slate-500 group-hover:text-indigo-400 transition"></i>
+            <span class="font-bold text-white">Suite Web E2E</span>
+            <i id="radio-web" class="fa-regular fa-circle text-slate-600"></i>
           </div>
-          <p class="text-xs text-slate-400">Ejecuta tests contra SauceDemo (Selenium Headless)</p>
+          <p class="text-xs text-slate-400">Pruebas contra SauceDemo (Selenium Headless)</p>
+        </div>
+      </div>
+
+      <!-- Execution Action Button -->
+      <div class="flex justify-end mb-8">
+        <button onclick="executeSelectedSuite()" id="btn-execute" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition flex items-center gap-3 shadow-lg shadow-indigo-600/30">
+          <i class="fa-solid fa-play"></i> Ejecutar Suite Seleccionada (<span id="lbl-suite">API</span>)
         </button>
       </div>
 
@@ -154,7 +161,7 @@
           <span id="runner-timer">00:00</span>
         </div>
         <div id="console-logs" class="min-h-[100px] text-slate-300 space-y-1">
-          <p class="text-slate-500">&gt; Presiona un botón superior para iniciar la ejecución...</p>
+          <p class="text-slate-500">&gt; Selecciona una suite arriba y haz clic en 'Ejecutar Suite' para iniciar...</p>
         </div>
         <div id="report-container" class="hidden pt-4 border-t border-slate-800">
           <a id="report-link" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold transition">
@@ -176,7 +183,7 @@
     <p>© 2026 Walther Portuguez Oscorima — Senior QE Automation Portfolio</p>
   </footer>
 
-  <!-- Runner Logic with Persistence -->
+  <!-- Runner Logic with Selection & Persistence -->
   <script>
     const CONFIG = {
       repo: "Walther03/qa-automation",
@@ -186,6 +193,7 @@
       timeoutMs: 300000
     };
 
+    let selectedSuite = "api";
     let pollInterval = null;
     let timerInterval = null;
     let startTimeMs = 0;
@@ -195,6 +203,7 @@
       const savedStartTime = localStorage.getItem("test_start_time");
 
       if (activeSuite && savedStartTime && (Date.now() - savedStartTime < CONFIG.timeoutMs)) {
+        selectSuite(activeSuite);
         startTimeMs = parseInt(savedStartTime, 10);
         startTimerUI();
         appendLog(`[INFO] Se detectó una ejecución activa (${activeSuite.toUpperCase()}). Reanudando seguimiento...`);
@@ -205,7 +214,32 @@
       }
     });
 
-    async function triggerRun(suiteName) {
+    function selectSuite(suiteName) {
+      if (localStorage.getItem("active_test_suite")) return; // Bloquear cambio si ya está corriendo
+
+      selectedSuite = suiteName;
+      document.getElementById("lbl-suite").innerText = suiteName.toUpperCase();
+
+      const cardApi = document.getElementById("card-api");
+      const cardWeb = document.getElementById("card-web");
+      const radioApi = document.getElementById("radio-api");
+      const radioWeb = document.getElementById("radio-web");
+
+      if (suiteName === "api") {
+        cardApi.className = "p-4 bg-slate-900 border-2 border-indigo-500 rounded-xl cursor-pointer transition";
+        cardWeb.className = "p-4 bg-slate-900 border-2 border-slate-800 hover:border-slate-700 rounded-xl cursor-pointer transition";
+        radioApi.className = "fa-solid fa-circle-dot text-indigo-400";
+        radioWeb.className = "fa-regular fa-circle text-slate-600";
+      } else {
+        cardWeb.className = "p-4 bg-slate-900 border-2 border-indigo-500 rounded-xl cursor-pointer transition";
+        cardApi.className = "p-4 bg-slate-900 border-2 border-slate-800 hover:border-slate-700 rounded-xl cursor-pointer transition";
+        radioWeb.className = "fa-solid fa-circle-dot text-indigo-400";
+        radioApi.className = "fa-regular fa-circle text-slate-600";
+      }
+    }
+
+    async function executeSelectedSuite() {
+      const suiteName = selectedSuite;
       clearExecutionState();
       resetConsole();
       setRunnerState("RUNNING", `Disparando ${suiteName.toUpperCase()}`);
@@ -301,24 +335,23 @@
 
     function setRunnerState(state, text) {
       const badge = document.getElementById("runner-badge");
-      const btnApi = document.getElementById("btn-api");
-      const btnWeb = document.getElementById("btn-web");
+      const btnExecute = document.getElementById("btn-execute");
 
       if (state === "RUNNING") {
         badge.className = "self-start md:self-auto px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-xs font-semibold animate-pulse";
         badge.innerText = `Estado: ${text}`;
-        btnApi.disabled = true;
-        btnWeb.disabled = true;
+        btnExecute.disabled = true;
+        btnExecute.classList.add("opacity-50", "cursor-not-allowed");
       } else if (state === "SUCCESS") {
         badge.className = "self-start md:self-auto px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-semibold";
         badge.innerText = `Estado: ${text}`;
-        btnApi.disabled = false;
-        btnWeb.disabled = false;
+        btnExecute.disabled = false;
+        btnExecute.classList.remove("opacity-50", "cursor-not-allowed");
       } else {
         badge.className = "self-start md:self-auto px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full text-xs font-semibold";
         badge.innerText = `Estado: ${text}`;
-        btnApi.disabled = false;
-        btnWeb.disabled = false;
+        btnExecute.disabled = false;
+        btnExecute.classList.remove("opacity-50", "cursor-not-allowed");
       }
     }
 

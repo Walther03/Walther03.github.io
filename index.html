@@ -1,358 +1,352 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Walther Portuguez Oscorima · QE Automation</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#F2F5F9; --surface:#FFFFFF; --ink:#13203A; --muted:#55627A; --line:#D8DFEA;
-  --accent:#2F5BFF; --accent-ink:#FFFFFF; --pass:#14804F; --fail:#C73A3A; --run:#B7791F;
-  --term:#16243D; --term-ink:#DDE6F7; --term-muted:#8CA0C4;
-  --display:"Bricolage Grotesque",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#0F1727; --surface:#16213A; --ink:#E7EDF9; --muted:#9AA9C6; --line:#263553;
-    --accent:#6F8CFF; --accent-ink:#0F1727; --pass:#3FCF8E; --fail:#FF7B7B; --run:#F2B84B;
-    --term:#0B1424; --term-ink:#DDE6F7; --term-muted:#7F93B8;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0F1727; --surface:#16213A; --ink:#E7EDF9; --muted:#9AA9C6; --line:#263553;
-  --accent:#6F8CFF; --accent-ink:#0F1727; --pass:#3FCF8E; --fail:#FF7B7B; --run:#F2B84B;
-  --term:#0B1424; --term-ink:#DDE6F7; --term-muted:#7F93B8;
-}
-*{box-sizing:border-box}
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--body)}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-header.top{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
-.brand{font:700 20px var(--display);text-decoration:none}
-nav{display:flex;gap:22px;align-items:center;font-size:15px}
-nav a{text-decoration:none;color:var(--muted)}
-nav a:hover{color:var(--ink)}
-.theme{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:14px}
-
-.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:48px;align-items:start;padding:40px 0 72px}
-h1{font:700 clamp(38px,5.4vw,64px)/1.05 var(--display);letter-spacing:-.02em;margin:0 0 20px}
-.lead{color:var(--muted);max-width:46ch;margin:0 0 28px}
-.cta{display:flex;gap:12px;flex-wrap:wrap}
-.btn{display:inline-block;border-radius:10px;padding:12px 20px;font:500 16px var(--body);text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn:disabled{opacity:.6;cursor:progress}
-.facts{display:flex;gap:28px;margin-top:36px;color:var(--muted);font-size:15px;flex-wrap:wrap}
-.facts b{display:block;font:700 26px var(--display);color:var(--ink)}
-
-/* Runner */
-.runner{background:var(--term);color:var(--term-ink);border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 20px 50px -24px rgba(10,20,50,.5)}
-.tabs{display:flex;gap:4px;padding:10px 10px 0;border-bottom:1px solid rgba(255,255,255,.1)}
-.tab{background:none;border:0;color:var(--term-muted);font:500 15px var(--body);padding:10px 16px;border-radius:10px 10px 0 0;cursor:pointer}
-.tab[aria-selected="true"]{background:rgba(255,255,255,.08);color:var(--term-ink)}
-.rhead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;flex-wrap:wrap}
-.rhead .meta{font:400 13px var(--mono);color:var(--term-muted)}
-.mode{font:400 12px var(--mono);padding:3px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.2);color:var(--term-muted)}
-.steps{list-style:none;margin:0;padding:0 18px 8px;font:400 13.5px/1.5 var(--mono);min-height:236px}
-.steps li{display:grid;grid-template-columns:20px 1fr auto;gap:8px;padding:5px 0}
-.steps .ic{color:var(--term-muted)}
-.steps .st-pass .ic{color:var(--pass)}
-.steps .st-fail .ic{color:var(--fail)}
-.steps .st-run .ic{color:var(--run)}
-.steps .ms{color:var(--term-muted)}
-.steps .idle{display:block;color:var(--term-muted);padding:34px 0;text-align:center;font-family:var(--body);font-size:15px}
-.rfoot{padding:14px 18px 18px;border-top:1px solid rgba(255,255,255,.1);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.bar{flex:1 1 140px;height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;display:flex}
-.bar i{display:block;height:100%}
-.bar .p{background:var(--pass)} .bar .f{background:var(--fail)}
-.sum{font:400 13px var(--mono);color:var(--term-ink)}
-.report{display:none;padding:0 18px 18px;gap:10px;flex-wrap:wrap}
-.report.on{display:flex}
-.report .btn{background:rgba(255,255,255,.08);color:var(--term-ink);border-color:rgba(255,255,255,.2);font-size:14px;padding:9px 14px}
-.note{font-size:13px;color:var(--muted);margin:12px 4px 0}
-
-section{padding:72px 0;border-top:1px solid var(--line)}
-h2{font:700 clamp(28px,3.4vw,40px)/1.1 var(--display);letter-spacing:-.015em;margin:0 0 12px}
-.sub{color:var(--muted);max-width:60ch;margin:0 0 36px}
-.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:s;list-style:none;padding:0;margin:0}
-.flow li{counter-increment:s;padding:0 22px 0 0;position:relative}
-.flow li::before{content:counter(s);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font:700 15px var(--display);margin-bottom:14px}
-.flow li::after{content:"";position:absolute;top:17px;left:42px;right:8px;height:2px;background:var(--line)}
-.flow li:last-child::after{display:none}
-.flow h3{font:700 18px var(--display);margin:0 0 6px}
-.flow p{margin:0;color:var(--muted);font-size:15px}
-
-.stack{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
-.stack h3{font:700 18px var(--display);margin:0 0 10px}
-.stack ul{margin:0;padding:0;list-style:none;color:var(--muted);font-size:16px}
-.stack li{padding:6px 0;border-bottom:1px solid var(--line)}
-
-.exp{list-style:none;margin:0;padding:0}
-.exp li{display:grid;grid-template-columns:140px 1fr;gap:24px;padding:20px 0;border-top:1px solid var(--line)}
-.exp .when{font:400 14px var(--mono);color:var(--muted);padding-top:4px}
-.exp h3{font:700 19px var(--display);margin:0 0 4px}
-.exp p{margin:0;color:var(--muted);font-size:15.5px;max-width:70ch}
-.proj{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px}
-.card h3{font:700 20px var(--display);margin:0}
-.card p{margin:0;color:var(--muted);font-size:15px;flex:1}
-.card .tags{font:400 12.5px var(--mono);color:var(--muted)}
-.card a{font-weight:500;font-size:15px;color:var(--accent)}
-
-.about{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
-.about p{color:var(--muted);margin:0 0 14px}
-.contact a{display:block;padding:12px 0;border-bottom:1px solid var(--line);text-decoration:none;font-weight:500}
-footer{padding:32px 0 48px;color:var(--muted);font-size:14px;border-top:1px solid var(--line)}
-
-@media (max-width:860px){
-  .hero{grid-template-columns:1fr;gap:36px}
-  .flow{grid-template-columns:1fr 1fr;gap:28px}.flow li::after{display:none}
-  .stack,.proj,.about{grid-template-columns:1fr}
-  .exp li{grid-template-columns:1fr;gap:4px}
-  nav a.hide{display:none}
-}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Walther Portuguez | Senior QE Automation Portfolio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-<div class="wrap">
-  <header class="top">
-    <a class="brand" href="#">Walther Portuguez Oscorima</a>
-    <nav>
-      <a class="hide" href="#como">Cómo funciona</a>
-      <a class="hide" href="#experiencia">Experiencia</a>
-      <a class="hide" href="#stack">Stack</a>
-      <a class="hide" href="#proyectos">Proyectos</a>
-      <a href="#contacto">Contacto</a>
-      <button class="theme" id="theme" type="button" aria-label="Cambiar tema">Tema</button>
-    </nav>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-900/80 border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+      <span class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+        Walther Portuguez
+      </span>
+      <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-300">
+        <a href="#about" class="hover:text-indigo-400 transition">Sobre mí</a>
+        <a href="#projects" class="hover:text-indigo-400 transition">Proyectos</a>
+        <a href="#runner" class="hover:text-indigo-400 transition">Runner en Vivo</a>
+        <a href="#contact" class="hover:text-indigo-400 transition">Contacto</a>
+      </nav>
+      <a href="cv-walther-portuguez.pdf" target="_blank" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition flex items-center gap-2">
+        <i class="fa-solid fa-file-arrow-down"></i> Descargar CV
+      </a>
+    </div>
   </header>
 
-  <main>
-    <div class="hero">
+  <!-- Hero Section -->
+  <section id="about" class="max-w-6xl mx-auto px-4 py-20 grid md:grid-cols-3 gap-12 items-center">
+    <div class="md:col-span-2 space-y-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> ISTQB CTFL & CTAL-TAE Certified
+      </div>
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white">
+        Senior Quality Engineer & Automation Architect
+      </h1>
+      <p class="text-slate-400 text-lg leading-relaxed">
+        Más de 7 años diseñando e implementando marcos de automatización robustos, escalables e integrados en pipelines CI/CD. Especializado en pruebas backend (API), web y móviles con Java, Selenium, TestNG, RestAssured y Appium.
+      </p>
+      <div class="flex flex-wrap gap-3 pt-2">
+        <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300">Java / TypeScript</span>
+        <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300">Selenium WebDriver</span>
+        <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300">RestAssured</span>
+        <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300">TestNG / JUnit</span>
+        <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300">Appium</span>
+        <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300">GitHub Actions</span>
+        <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded-md text-xs text-slate-300">Allure Reports</span>
+      </div>
+    </div>
+    <div class="bg-slate-800/50 border border-slate-700/60 p-6 rounded-2xl space-y-4 shadow-xl">
+      <h3 class="text-lg font-semibold text-white border-b border-slate-700 pb-3">Experiencia Destacada</h3>
       <div>
-        <h1>Pruebas automatizadas que puedes ejecutar tú mismo.</h1>
-        <p class="lead">Soy Ingeniero de Calidad con más de 7 años automatizando pruebas web, móviles y de servicios. Elige una suite, pulsa Ejecutar y mira cómo corre en un pipeline real, con su reporte al final.</p>
-        <div class="cta">
-          <a class="btn primary" href="#runner-start" id="goRun">Ejecutar una suite</a>
-          <a class="btn" id="repoLink" href="https://github.com/Walther03/qa-automation" target="_blank" rel="noopener">Ver el código</a>
-        </div>
-        <div class="facts">
-          <div><b>7+ años</b>automatizando pruebas</div>
-          <div><b>ISTQB</b>CTFL y CTAL-TAE</div>
-          <div><b>Web · App · API</b>en un mismo flujo</div>
-        </div>
+        <h4 class="text-indigo-400 font-semibold">Senior QE Automation</h4>
+        <p class="text-xs text-slate-400">Stefanini (2026 – Actualidad)</p>
+        <p class="text-xs text-slate-300 mt-1">Automatización multicapa (Web, Mobile, APIs), verificación de microservicios, eventos RabbitMQ y bases de datos SQL/NoSQL.</p>
       </div>
-
-      <div id="runner-start">
-        <div class="runner" aria-live="polite">
-          <div class="tabs" role="tablist" id="tabs"></div>
-          <div class="rhead">
-            <span class="meta" id="meta"></span>
-            <span class="mode" id="mode"></span>
-          </div>
-          <ul class="steps" id="steps"><li><span class="idle">Elige una suite y pulsa Ejecutar.</span></li></ul>
-          <div class="rfoot">
-            <button class="btn primary" id="run" type="button">Ejecutar</button>
-            <div class="bar" aria-hidden="true"><i class="p" id="bp" style="width:0"></i><i class="f" id="bf" style="width:0"></i></div>
-            <span class="sum" id="sum">Sin ejecutar</span>
-          </div>
-          <div class="report" id="report">
-            <a class="btn" id="repLink" href="#" target="_blank" rel="noopener">Abrir reporte completo</a>
-            <a class="btn" id="runLink" href="#" target="_blank" rel="noopener">Ver ejecución en GitHub</a>
-          </div>
-        </div>
-        <p class="note" id="note"></p>
-      </div>
-    </div>
-  </main>
-
-  <section id="como">
-    <h2>Qué pasa cuando pulsas Ejecutar</h2>
-    <p class="sub">No es una animación: cada paso corresponde a algo real que puedes revisar en el repositorio.</p>
-    <ol class="flow">
-      <li><h3>Disparo</h3><p>Esta página pide a un servicio intermedio que lance el workflow, sin exponer ningún token.</p></li>
-      <li><h3>Ejecución</h3><p>GitHub Actions levanta el entorno y corre la suite que elegiste.</p></li>
-      <li><h3>Seguimiento</h3><p>La página consulta el estado de cada paso y lo muestra mientras avanza.</p></li>
-      <li><h3>Reporte</h3><p>Al terminar, publica el reporte con evidencias y te enlaza la ejecución.</p></li>
-    </ol>
-  </section>
-
-  <section id="stack">
-    <h2>Con qué trabajo</h2>
-    <p class="sub">Herramientas con las que he trabajado en proyectos reales.</p>
-    <div class="stack">
-      <div><h3>Automatización</h3><ul><li>Selenium WebDriver, TestNG, JUnit</li><li>Appium (Android e iOS)</li><li>RestAssured, Karate, Postman, SoapUI</li><li>UFT y Sikuli</li></ul></div>
-      <div><h3>Entornos y datos</h3><ul><li>Pods y microservicios</li><li>Jenkins y entornos virtualizados</li><li>LambdaTest</li><li>RabbitMQ</li><li>MongoDB, SQL Server, MySQL</li></ul></div>
-      <div><h3>Calidad y gestión</h3><ul><li>Planes de prueba en Jira y Zephyr</li><li>Rendimiento con JMeter</li><li>SonarQube y Fortify</li><li>ISTQB CTFL y CTAL-TAE</li></ul></div>
-    </div>
-  </section>
-
-  <section id="experiencia">
-    <h2>Experiencia</h2>
-    <p class="sub">Los proyectos de clientes son confidenciales, por eso el código que ves en el portafolio es propio.</p>
-    <ul class="exp">
-      <li><span class="when">2026 – actualidad</span><div><h3>Senior QE Automation · Stefanini</h3><p>Automatizo pruebas web, móviles y de backend con Selenium, TestNG, Appium, RestAssured, Postman y Karate. Levanto pods para armar entornos de prueba, verifico microservicios y valido flujos de mensajería en RabbitMQ y datos en MongoDB y SQL Server, en QA, Stage y Prod.</p></div></li>
-      <li><span class="when">2020 – 2026</span><div><h3>Quality Engineer · Tekton Labs</h3><p>Diseñé y ejecuté pruebas automatizadas y manuales para aplicaciones web, móviles y microservicios con Selenium, TestNG, Appium, RestAssured y Postman. Refiné historias de usuario, estimé y planifiqué pruebas en Jira y Zephyr, y validé en QA, Stage y Prod, incluida la mensajería con RabbitMQ y consultas en MongoDB y SQL Server.</p></div></li>
-      <li><span class="when">2019 – 2020</span><div><h3>Analista QA Automatizador · Canvia</h3><p>Frameworks con UFT, integración continua con Jenkins, entornos virtualizados y planes e informes de prueba.</p></div></li>
-      <li><span class="when">2019</span><div><h3>Analista Técnico de Calidad · Tsoft y QüeryFull</h3><p>Frameworks open source con Selenium y Sikuli, y automatización de procesos de negocio.</p></div></li>
-      <li><span class="when">2018 – 2019</span><div><h3>Analista de sistemas de TI · Hundred SAC (cliente Equifax)</h3><p>Pruebas web y SOAP automatizadas, rendimiento con JMeter y calidad de código con SonarQube.</p></div></li>
-    </ul>
-  </section>
-
-  <section id="proyectos">
-    <h2>Proyectos</h2>
-    <p class="sub">Cada uno tiene su repositorio, su pipeline y su reporte.</p>
-    <div class="proj">
-      <article class="card"><h3>Framework de API</h3><p>Validación de contratos, autenticación y flujos de pedidos con reportes por ejecución.</p><span class="tags">Java · RestAssured · TestNG</span><a href="https://github.com/Walther03/api-tests" target="_blank" rel="noopener">Ver repositorio</a></article>
-      <article class="card"><h3>Framework Web E2E</h3><p>Page Object, ejecución en paralelo y capturas para depurar fallos.</p><span class="tags">Java · Selenium · TestNG</span><a href="https://github.com/Walther03/web-tests" target="_blank" rel="noopener">Ver repositorio</a></article>
-      <article class="card"><h3>Automatización móvil</h3><p>Pruebas en emulador Android dentro del pipeline, con capturas por cada paso.</p><span class="tags">Appium · Android</span><a href="https://github.com/Walther03/mobile-tests" target="_blank" rel="noopener">Ver repositorio</a></article>
-    </div>
-  </section>
-
-  <section id="contacto">
-    <div class="about">
       <div>
-        <h2>Sobre mí</h2>
-        <p>Ingeniero de Calidad de Software con más de 7 años en automatización de pruebas y aseguramiento de calidad, en proyectos web, móviles y de escritorio. Certificado ISTQB en Foundation y en Ingeniería de Automatización de Pruebas (Advanced).</p>
-        <p>Me dedico a entregar software de alta calidad y a mejorar de forma continua los procesos de testing.</p>
-      </div>
-      <div class="contact">
-        <h2>Contacto</h2>
-        <a href="mailto:waportuguezo@gmail.com">waportuguezo@gmail.com</a>
-        <a href="https://www.linkedin.com/in/walther-antonio-portuguez-oscorima-737a17100/" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="https://github.com/Walther03" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://www.youtube.com/@walther-96" target="_blank" rel="noopener">Mi canal de YouTube (por hobby)</a>
-        <a href="#" target="_blank" rel="noopener">Descargar CV</a>
+        <h4 class="text-indigo-400 font-semibold">Quality Engineer</h4>
+        <p class="text-xs text-slate-400">Tekton Labs (2020 – 2026)</p>
+        <p class="text-xs text-slate-300 mt-1">Líder en estrategias de prueba para plataformas web y apps móviles integrando pruebas cloud en LambdaTest.</p>
       </div>
     </div>
   </section>
-</div>
-<footer><div class="wrap">© 2026 Walther Portuguez Oscorima. Portafolio de QE Automation.</div></footer>
 
-<script>
-/* ========= CONFIGURACIÓN: edita solo este bloque ========= */
-const CONFIG = {
-  repo: "Walther03/qa-automation",
-  workerUrl: "https://qa-runner-proxy.waportuguezo.workers.dev/",
-  reportUrl: "https://walther03.github.io/qa-automation/",
-  pollMs: 8000,
-  timeoutMs: 300000
-};
-/* ======================================================== */
+  <!-- Projects Cards Section -->
+  <section id="projects" class="max-w-6xl mx-auto px-4 py-16 border-t border-slate-800">
+    <h2 class="text-2xl font-bold text-white mb-8">Estructura de la Suite de Pruebas</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- API Card -->
+      <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition">
+        <div>
+          <div class="w-10 h-10 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400 mb-4">
+            <i class="fa-solid fa-network-wired text-lg"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">API Test Suite</h3>
+          <p class="text-slate-400 text-sm mb-4">Pruebas automatizadas sobre servicios REST con RestAssured, aserciones avanzadas y validación de esquemas JSON.</p>
+        </div>
+        <a href="https://github.com/Walther03/qa-automation/tree/main/src/test/java/com/portfolio/api" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold flex items-center gap-2">
+          Ver Código Java <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+        </a>
+      </div>
 
-const SUITES = {
-  api:   {label:"API",    tool:"Java · RestAssured · TestNG · QA", tests:[
-    ["GET /users devuelve 200 y esquema válido",140],["POST /orders crea un pedido",220],
-    ["POST /orders sin token devuelve 401",90],["PUT /orders/{id} actualiza el estado",180],
-    ["DELETE /orders/{id} es idempotente",110],["GET /orders pagina correctamente",160],
-    ["Mensaje publicado en RabbitMQ llega al consumidor",300],["El registro queda guardado en MongoDB",250]]},
-  web:   {label:"Web",    tool:"Java · Selenium WebDriver · TestNG · Chrome", tests:[
-    ["Login con credenciales válidas",1900],["Login con clave incorrecta muestra error",1400],
-    ["Buscar producto y filtrar por precio",2300],["Agregar al carrito y verificar total",2100],
-    ["Checkout completo con tarjeta de prueba",3200]]},
-  mobile:{label:"Mobile", tool:"Java · Appium · Android (emulador)", tests:[
-    ["La app abre y muestra la pantalla de inicio",2600],["Login biométrico simulado",2200],
-    ["Navegación entre pestañas",1800],["Rotación de pantalla conserva el estado",1500]]}
-};
+      <!-- Web Card -->
+      <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition">
+        <div>
+          <div class="w-10 h-10 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400 mb-4">
+            <i class="fa-solid fa-laptop-code text-lg"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-2">Web E2E Suite</h3>
+          <p class="text-slate-400 text-sm mb-4">Flujos E2E con Selenium WebDriver en modo Headless Chrome, validación de componentes dinámicos y Page Object Model.</p>
+        </div>
+        <a href="https://github.com/Walther03/qa-automation/tree/main/src/test/java/com/portfolio/web" target="_blank" class="text-indigo-400 hover:text-indigo-300 text-sm font-semibold flex items-center gap-2">
+          Ver Código Java <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+        </a>
+      </div>
 
-const $ = id => document.getElementById(id);
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-let current = "api", running = false;
-const live = !!CONFIG.workerUrl;
+      <!-- Mobile Card -->
+      <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-6 flex flex-col justify-between opacity-80 border-dashed">
+        <div>
+          <div class="w-10 h-10 bg-slate-700/30 border border-slate-600/30 rounded-lg flex items-center justify-center text-slate-400 mb-4">
+            <i class="fa-solid fa-mobile-screen-button text-lg"></i>
+          </div>
+          <div class="flex items-center gap-2 mb-2">
+            <h3 class="text-lg font-bold text-white">Mobile Suite</h3>
+            <span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded text-[10px] font-semibold">Fase 2</span>
+          </div>
+          <p class="text-slate-400 text-sm mb-4">Automatización Appium sobre emulador Android. Actualmente reservada para la siguiente fase por optimización de runners.</p>
+        </div>
+        <span class="text-slate-500 text-sm font-semibold">Modo Demo / Próximamente</span>
+      </div>
+    </div>
+  </section>
 
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+  <!-- Interactive Runner Section -->
+  <section id="runner" class="max-w-6xl mx-auto px-4 py-16 border-t border-slate-800">
+    <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+            <i class="fa-solid fa-terminal text-indigo-400"></i> Runner de Pruebas en Vivo
+          </h2>
+          <p class="text-slate-400 text-sm mt-1">Selecciona una suite para lanzar la ejecución real en el servidor de GitHub Actions vía Cloudflare Worker Proxy.</p>
+        </div>
+        <div id="runner-badge" class="self-start md:self-auto px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs font-semibold text-slate-300">
+          Estado: Listo
+        </div>
+      </div>
 
-function buildTabs(){
-  $("tabs").innerHTML = Object.keys(SUITES).map(k =>
-    `<button class="tab" role="tab" data-k="${k}" aria-selected="${k===current}">${SUITES[k].label}</button>`).join("");
-  $("tabs").querySelectorAll(".tab").forEach(b => b.onclick = () => { if(!running){ current=b.dataset.k; buildTabs(); reset(); }});
-}
-function reset(){
-  const s = SUITES[current];
-  $("meta").textContent = s.tool;
-  $("mode").textContent = live ? "en vivo · GitHub Actions" : "modo demo";
-  $("steps").innerHTML = `<li><span class="idle">${s.tests.length} pruebas listas. Pulsa Ejecutar.</span></li>`;
-  $("bp").style.width = $("bf").style.width = "0";
-  $("sum").textContent = "Sin ejecutar";
-  $("report").classList.remove("on");
-  $("note").textContent = live ? "" : "Modo demo: la ejecución es simulada. Conecta tu repositorio en CONFIG para ver ejecuciones reales.";
-}
-function row(name, state, ms){
-  const ic = {idle:"○", run:"◐", pass:"✓", fail:"✕"}[state];
-  return `<li class="st-${state}"><span class="ic">${ic}</span><span>${esc(name)}</span><span class="ms">${ms||""}</span></li>`;
-}
-function paint(items){
-  $("steps").innerHTML = items.map(i => row(i.name, i.state, i.ms)).join("");
-  const done = items.filter(i => i.state==="pass"||i.state==="fail");
-  const p = items.filter(i => i.state==="pass").length, f = items.filter(i => i.state==="fail").length;
-  $("bp").style.width = (p/items.length*100)+"%";
-  $("bf").style.width = (f/items.length*100)+"%";
-  $("sum").textContent = `${p} pasaron · ${f} fallaron · ${done.length}/${items.length}`;
-}
-function finish(runUrl){
-  $("repLink").href = CONFIG.reportUrl;
-  $("runLink").href = runUrl || `https://github.com/${CONFIG.repo}/actions`;
-  $("report").classList.add("on");
-}
+      <!-- Controls -->
+      <div class="grid md:grid-cols-2 gap-4 mb-8">
+        <button onclick="triggerRun('api')" id="btn-api" class="p-4 bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-xl text-left transition group">
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-bold text-white group-hover:text-indigo-400 transition">Suite API REST</span>
+            <i class="fa-solid fa-play text-slate-500 group-hover:text-indigo-400 transition"></i>
+          </div>
+          <p class="text-xs text-slate-400">Ejecuta tests contra JSONPlaceholder (RestAssured)</p>
+        </button>
 
-async function demoRun(){
-  const items = SUITES[current].tests.map(t => ({name:t[0], state:"idle", ms:"", dur:t[1]}));
-  paint(items);
-  for (const it of items){
-    it.state = "run"; paint(items);
-    await sleep(Math.min(1400, 350 + it.dur/3));
-    it.state = "pass"; it.ms = it.dur >= 1000 ? (it.dur/1000).toFixed(1)+" s" : it.dur+" ms";
-    paint(items);
-  }
-  finish();
-}
+        <button onclick="triggerRun('web')" id="btn-web" class="p-4 bg-slate-900 border border-slate-800 hover:border-indigo-500/50 rounded-xl text-left transition group">
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-bold text-white group-hover:text-indigo-400 transition">Suite Web E2E</span>
+            <i class="fa-solid fa-play text-slate-500 group-hover:text-indigo-400 transition"></i>
+          </div>
+          <p class="text-xs text-slate-400">Ejecuta tests contra SauceDemo (Selenium Headless)</p>
+        </button>
+      </div>
 
-async function liveRun(){
-  const t0 = Date.now() - 15000;
-  paint([{name:"Solicitando ejecución…", state:"run"}]);
-  const r = await fetch(CONFIG.workerUrl, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({suite:current})});
-  if (!r.ok) throw new Error(r.status === 429 ? "Hay una ejecución reciente. Intenta en unos minutos." : "No se pudo iniciar la ejecución.");
-  const end = Date.now() + CONFIG.timeoutMs;
-  while (Date.now() < end){
-    await sleep(CONFIG.pollMs);
-    const rs = await (await fetch(`https://api.github.com/repos/${CONFIG.repo}/actions/runs?event=workflow_dispatch&per_page=1`)).json();
-    const run = rs.workflow_runs && rs.workflow_runs[0];
-    if (!run || new Date(run.created_at).getTime() < t0) continue;
-    const js = await (await fetch(run.jobs_url)).json();
-    const steps = (js.jobs && js.jobs[0] ? js.jobs[0].steps : []).map(s => ({
-      name: s.name,
-      state: s.status === "completed" ? (s.conclusion === "success" || s.conclusion === "skipped" ? "pass" : "fail") : (s.status === "in_progress" ? "run" : "idle"),
-      ms: s.completed_at && s.started_at ? Math.max(1, Math.round((new Date(s.completed_at)-new Date(s.started_at))/1000))+" s" : ""
-    }));
-    if (steps.length) paint(steps);
-    if (run.status === "completed"){ finish(run.html_url); return; }
-  }
-  throw new Error("La ejecución tardó demasiado. Revísala en GitHub.");
-}
+      <!-- Live Console / Progress Output -->
+      <div class="bg-black/80 border border-slate-800 rounded-xl p-5 font-mono text-xs space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 text-slate-500">
+          <span>SALIDA DE LA CONSOLA</span>
+          <span id="runner-timer">00:00</span>
+        </div>
+        <div id="console-logs" class="min-h-[100px] text-slate-300 space-y-1">
+          <p class="text-slate-500">&gt; Presiona un botón superior para iniciar la ejecución...</p>
+        </div>
+        <div id="report-container" class="hidden pt-4 border-t border-slate-800">
+          <a id="report-link" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold transition">
+            <i class="fa-solid fa-chart-pie"></i> Abrir Reporte Allure en Vivo
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-$("run").onclick = async () => {
-  if (running) return;
-  running = true; $("run").disabled = true; $("run").textContent = "Ejecutando…";
-  $("report").classList.remove("on");
-  try { await (live ? liveRun() : demoRun()); }
-  catch(e){ $("steps").innerHTML = row(e.message, "fail"); $("sum").textContent = "No se completó"; }
-  running = false; $("run").disabled = false; $("run").textContent = "Ejecutar de nuevo";
-};
+  <!-- Contact / Footer -->
+  <footer id="contact" class="max-w-6xl mx-auto px-4 py-12 border-t border-slate-800 text-center text-slate-500 text-sm">
+    <div class="flex justify-center gap-6 mb-6 text-xl">
+      <a href="https://github.com/Walther03" target="_blank" class="hover:text-white transition"><i class="fa-brands fa-github"></i></a>
+      <a href="https://www.linkedin.com/in/walther-antonio-portuguez-oscorima-737a17100/" target="_blank" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+      <a href="mailto:waportuguezo@gmail.com" class="hover:text-white transition"><i class="fa-solid fa-envelope"></i></a>
+      <a href="https://www.youtube.com/@walther-96" target="_blank" class="hover:text-white transition"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+    <p>© 2026 Walther Portuguez Oscorima — Senior QE Automation Portfolio</p>
+  </footer>
 
-$("repoLink").href = `https://github.com/${CONFIG.repo}`;
-$("theme").onclick = () => {
-  const root = document.documentElement;
-  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-  root.dataset.theme = dark ? "light" : "dark";
-};
-buildTabs(); reset();
-</script>
+  <!-- Runner Logic with Persistence -->
+  <script>
+    const CONFIG = {
+      repo: "Walther03/qa-automation",
+      workerUrl: "https://qa-runner-proxy.waportuguezo.workers.dev/",
+      reportUrl: "https://walther03.github.io/qa-automation/",
+      pollMs: 8000,
+      timeoutMs: 300000
+    };
+
+    let pollInterval = null;
+    let timerInterval = null;
+    let startTimeMs = 0;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const activeSuite = localStorage.getItem("active_test_suite");
+      const savedStartTime = localStorage.getItem("test_start_time");
+
+      if (activeSuite && savedStartTime && (Date.now() - savedStartTime < CONFIG.timeoutMs)) {
+        startTimeMs = parseInt(savedStartTime, 10);
+        startTimerUI();
+        appendLog(`[INFO] Se detectó una ejecución activa (${activeSuite.toUpperCase()}). Reanudando seguimiento...`);
+        setRunnerState("RUNNING", `Ejecutando ${activeSuite.toUpperCase()}`);
+        startPolling(activeSuite);
+      } else {
+        clearExecutionState();
+      }
+    });
+
+    async function triggerRun(suiteName) {
+      clearExecutionState();
+      resetConsole();
+      setRunnerState("RUNNING", `Disparando ${suiteName.toUpperCase()}`);
+      
+      startTimeMs = Date.now();
+      localStorage.setItem("active_test_suite", suiteName);
+      localStorage.setItem("test_start_time", startTimeMs);
+      startTimerUI();
+
+      appendLog(`[INIT] Solicitando ejecución de la suite '${suiteName}' al Cloudflare Worker Proxy...`);
+
+      try {
+        const response = await fetch(CONFIG.workerUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ suite: suiteName })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          appendLog(`[SUCCESS] Workflow disparado con éxito en GitHub Actions.`);
+          appendLog(`[POLLING] Consultando estado real en la API de GitHub cada ${CONFIG.pollMs / 1000}s...`);
+          startPolling(suiteName);
+        } else {
+          appendLog(`[ERROR] No se pudo iniciar el workflow: ${data.error || 'Error desconocido'}`);
+          setRunnerState("ERROR", "Error de ejecución");
+          stopTimerUI();
+          clearExecutionState();
+        }
+      } catch (err) {
+        appendLog(`[ERROR] Error al comunicar con el Worker: ${err.message}`);
+        setRunnerState("ERROR", "Error de conexión");
+        stopTimerUI();
+        clearExecutionState();
+      }
+    }
+
+    function startPolling(suiteName) {
+      if (pollInterval) clearInterval(pollInterval);
+
+      pollInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`https://api.github.com/repos/${CONFIG.repo}/actions/runs?per_page=1`);
+          const data = await res.json();
+          const latestRun = data.workflow_runs?.[0];
+
+          if (!latestRun) return;
+
+          const status = latestRun.status;
+          const conclusion = latestRun.conclusion;
+
+          if (status === "queued") {
+            setRunnerState("RUNNING", "Job en cola...");
+            appendLog(`[STATUS] Job en cola de espera en GitHub Actions...`);
+          } else if (status === "in_progress") {
+            setRunnerState("RUNNING", "Ejecutando tests...");
+            appendLog(`[STATUS] Corriendo suite de pruebas '${suiteName}' en runner de Ubuntu...`);
+          } else if (status === "completed") {
+            clearInterval(pollInterval);
+            stopTimerUI();
+            clearExecutionState();
+
+            if (conclusion === "success") {
+              setRunnerState("SUCCESS", "Completado con éxito");
+              appendLog(`[FINISH] Pruebas finalizadas con éxito. Generando reporte Allure...`);
+              showReportButton();
+            } else {
+              setRunnerState("FAILED", `Finalizado (${conclusion})`);
+              appendLog(`[FINISH] Ejecución completada con resultado: ${conclusion.toUpperCase()}`);
+              showReportButton();
+            }
+          }
+        } catch (error) {
+          appendLog(`[WARN] Error temporal consultando API de GitHub: ${error.message}`);
+        }
+      }, CONFIG.pollMs);
+    }
+
+    function appendLog(message) {
+      const logsContainer = document.getElementById("console-logs");
+      const p = document.createElement("p");
+      const time = new Date().toLocaleTimeString();
+      p.innerHTML = `<span class="text-slate-500">[${time}]</span> ${message}`;
+      logsContainer.appendChild(p);
+      logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+
+    function resetConsole() {
+      document.getElementById("console-logs").innerHTML = "";
+      document.getElementById("report-container").classList.add("hidden");
+    }
+
+    function setRunnerState(state, text) {
+      const badge = document.getElementById("runner-badge");
+      const btnApi = document.getElementById("btn-api");
+      const btnWeb = document.getElementById("btn-web");
+
+      if (state === "RUNNING") {
+        badge.className = "self-start md:self-auto px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-full text-xs font-semibold animate-pulse";
+        badge.innerText = `Estado: ${text}`;
+        btnApi.disabled = true;
+        btnWeb.disabled = true;
+      } else if (state === "SUCCESS") {
+        badge.className = "self-start md:self-auto px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-semibold";
+        badge.innerText = `Estado: ${text}`;
+        btnApi.disabled = false;
+        btnWeb.disabled = false;
+      } else {
+        badge.className = "self-start md:self-auto px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-400 rounded-full text-xs font-semibold";
+        badge.innerText = `Estado: ${text}`;
+        btnApi.disabled = false;
+        btnWeb.disabled = false;
+      }
+    }
+
+    function showReportButton() {
+      const container = document.getElementById("report-container");
+      const link = document.getElementById("report-link");
+      link.href = CONFIG.reportUrl;
+      container.classList.remove("hidden");
+    }
+
+    function startTimerUI() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        const elapsedSec = Math.floor((Date.now() - startTimeMs) / 1000);
+        const mins = String(Math.floor(elapsedSec / 60)).padStart(2, "0");
+        const secs = String(elapsedSec % 60).padStart(2, "0");
+        document.getElementById("runner-timer").innerText = `${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function stopTimerUI() {
+      if (timerInterval) clearInterval(timerInterval);
+    }
+
+    function clearExecutionState() {
+      localStorage.removeItem("active_test_suite");
+      localStorage.removeItem("test_start_time");
+    }
+  </script>
 </body>
 </html>
